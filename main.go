@@ -7,8 +7,10 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("/", ping)
 	mux.HandleFunc("/create", createURL)
+	mux.HandleFunc("/{id}", getURL)
 
 	http.ListenAndServe(":3001", mux)
 }
@@ -43,4 +45,15 @@ func createMessageResponse(w http.ResponseWriter, status int, message string) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": message,
 	})
+}
+
+func getURL(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		createMessageResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+		return
+	}
+
+	id := r.PathValue("id")
+
+	createMessageResponse(w, http.StatusOK, id)
 }
