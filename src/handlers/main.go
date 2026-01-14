@@ -1,15 +1,13 @@
 package handlers
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
 
+	"urlshortener.com/src/service"
 	"urlshortener.com/src/writer"
 )
 
-var db map[string]string = make(map[string]string, 0)
 var Handlers map[string]writer.JSONHandler = map[string]writer.JSONHandler{
 	"/":       ping,
 	"/{id}":   getURL,
@@ -28,9 +26,7 @@ func getURL(w *writer.Writer, r *http.Request) {
 		return
 	}
 
-	id := r.PathValue("id")
-
-	w.NewJSONResponse(http.StatusOK, writer.JSON{"url": db[id]})
+	w.NewJSONResponse(http.StatusOK, writer.JSON{"url": ""})
 }
 
 type CreateRequest struct {
@@ -53,20 +49,9 @@ func createURL(w *writer.Writer, r *http.Request) {
 		return
 	}
 
-	id, err := createRandomId()
-	if err != nil {
-		panic(err)
-	}
-	db[id] = req.URL
+	id := service.CreateURL(req.URL)
 
-	w.NewJSONResponse(http.StatusCreated, writer.JSON{"message": "URL was created successfully", "id": id})
-}
-
-func createRandomId() (string, error) {
-	bytes := make([]byte, 4)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-
-	return hex.EncodeToString(bytes), nil
+	w.NewJSONResponse(http.StatusCreated, writer.JSON{
+		"message": "URL was created successfully", "id": id,
+	})
 }
