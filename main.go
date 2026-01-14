@@ -16,7 +16,9 @@ func main() {
 }
 
 func ping(w http.ResponseWriter, r *http.Request) {
-	createMessageResponse(w, http.StatusOK, "Service is online")
+	NewJSONResponse(w, http.StatusOK, JSON{
+		"message": "Service is online",
+	})
 }
 
 type CreateRequest struct {
@@ -25,7 +27,9 @@ type CreateRequest struct {
 
 func createURL(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		createMessageResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+		NewJSONResponse(w, http.StatusMethodNotAllowed, JSON{
+			"message": "Method not allowed",
+		})
 		return
 	}
 
@@ -33,27 +37,27 @@ func createURL(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		createMessageResponse(w, http.StatusBadRequest, "Invalid request")
+		NewJSONResponse(w, http.StatusBadRequest, JSON{"message": "Invalid request"})
 		return
 	}
 
-	createMessageResponse(w, http.StatusCreated, "URL was created successfully")
-}
-
-func createMessageResponse(w http.ResponseWriter, status int, message string) {
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": message,
-	})
+	NewJSONResponse(w, http.StatusCreated, JSON{"message": "URL was created successfully"})
 }
 
 func getURL(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		createMessageResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+		NewJSONResponse(w, http.StatusMethodNotAllowed, JSON{"message": "Method not allowed"})
 		return
 	}
 
 	id := r.PathValue("id")
 
-	createMessageResponse(w, http.StatusOK, id)
+	NewJSONResponse(w, http.StatusOK, JSON{"id": id})
+}
+
+type JSON map[string]any
+
+func NewJSONResponse(w http.ResponseWriter, status int, res JSON) {
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(res)
 }
