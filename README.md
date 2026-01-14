@@ -35,4 +35,5 @@ Handlers depend only on the service interface, and the service depends only on r
 - [x] Documentation
 - [ ] Docker
 - [ ] Tests
+- [ ] Database migration scripts
 - [ ] (Optional) Add expiration date for URLs
