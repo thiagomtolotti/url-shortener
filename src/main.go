@@ -1,11 +1,15 @@
 package main
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 
 	"urlshortener.com/src/writer"
 )
+
+var db map[string]string = make(map[string]string, 0)
 
 func main() {
 	mux := http.NewServeMux()
@@ -43,7 +47,13 @@ func createURL(w *writer.Writer, r *http.Request) {
 		return
 	}
 
-	w.NewJSONResponse(http.StatusCreated, writer.JSON{"message": "URL was created successfully"})
+	id, err := createRandomId()
+	if err != nil {
+		panic(err)
+	}
+	db[id] = req.URL
+
+	w.NewJSONResponse(http.StatusCreated, writer.JSON{"message": "URL was created successfully", "id": id})
 }
 
 func getURL(w *writer.Writer, r *http.Request) {
@@ -54,5 +64,14 @@ func getURL(w *writer.Writer, r *http.Request) {
 
 	id := r.PathValue("id")
 
-	w.NewJSONResponse(http.StatusOK, writer.JSON{"id": id})
+	w.NewJSONResponse(http.StatusOK, writer.JSON{"url": db[id]})
+}
+
+func createRandomId() (string, error) {
+	bytes := make([]byte, 4)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(bytes), nil
 }
