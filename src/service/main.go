@@ -3,32 +3,40 @@ package service
 import (
 	"crypto/rand"
 	"encoding/hex"
+
+	"urlshortener.com/src/repository"
 )
 
-type ID string
+type Service struct {
+	repo repository.Repository
+}
 
-var db map[ID]string = make(map[ID]string, 0)
+func NewService(repo repository.Repository) Service {
+	return Service{
+		repo: repo,
+	}
+}
 
-func CreateURL(originalURL string) ID {
+func (s *Service) CreateURL(originalURL string) string {
 	id, err := newRandomId()
 	if err != nil {
 		panic(err)
 	}
 
-	db[id] = originalURL
+	s.repo.CreateURL(originalURL, id)
 
 	return id
 }
 
-func GetURL(id string) string {
-	return db[ID(id)]
+func (s *Service) GetURL(id string) string {
+	return s.repo.GetURL(id)
 }
 
-func newRandomId() (ID, error) {
+func newRandomId() (string, error) {
 	bytes := make([]byte, 4)
 	if _, err := rand.Read(bytes); err != nil {
 		return "", err
 	}
 
-	return ID(hex.EncodeToString(bytes)), nil
+	return (hex.EncodeToString(bytes)), nil
 }

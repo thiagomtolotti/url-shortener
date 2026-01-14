@@ -8,34 +8,46 @@ import (
 	"urlshortener.com/src/writer"
 )
 
-var Handlers map[string]writer.JSONHandler = map[string]writer.JSONHandler{
-	"/":       ping,
-	"/{id}":   getURL,
-	"/create": createURL,
+type ApiHandler struct {
+	service service.Service
 }
 
-func ping(w *writer.Writer, r *http.Request) {
+func RegisterRoutes(s service.Service) {
+	handler := ApiHandler{
+		service: s,
+	}
+
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("/", writer.Adapt(handler.ping))
+	mux.HandleFunc("/{id}", writer.Adapt(handler.getURL))
+	mux.HandleFunc("/create", writer.Adapt(handler.createURL))
+
+	http.ListenAndServe(":3001", mux)
+}
+
+func (ah *ApiHandler) ping(w *writer.Writer, r *http.Request) {
 	w.NewJSONResponse(http.StatusOK, writer.JSON{
 		"message": "Service is online",
 	})
 }
 
-func getURL(w *writer.Writer, r *http.Request) {
+func (ah *ApiHandler) getURL(w *writer.Writer, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.NewJSONResponse(http.StatusMethodNotAllowed, writer.JSON{"message": "Method not allowed"})
 		return
 	}
 
-	url := service.GetURL(r.PathValue("id"))
+	url := ah.service.GetURL(r.PathValue("id"))
 
 	w.NewJSONResponse(http.StatusOK, writer.JSON{"url": url})
 }
 
-type CreateRequest struct {
+type CreateURLRequest struct {
 	URL string `json:"url"`
 }
 
-func createURL(w *writer.Writer, r *http.Request) {
+func (ah *ApiHandler) createURL(w *writer.Writer, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.NewJSONResponse(http.StatusMethodNotAllowed, writer.JSON{
 			"message": "Method not allowed",
@@ -43,7 +55,7 @@ func createURL(w *writer.Writer, r *http.Request) {
 		return
 	}
 
-	var req CreateRequest
+	var req CreateURLRequest
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -51,7 +63,7 @@ func createURL(w *writer.Writer, r *http.Request) {
 		return
 	}
 
-	id := service.CreateURL(req.URL)
+	id := ah.service.CreateURL(req.URL)
 
 	w.NewJSONResponse(http.StatusCreated, writer.JSON{
 		"message": "URL was created successfully", "id": id,

@@ -1,18 +1,14 @@
 package main
 
 import (
-	"net/http"
-
 	"urlshortener.com/src/handlers"
-	"urlshortener.com/src/writer"
+	"urlshortener.com/src/repository"
+	"urlshortener.com/src/service"
 )
 
 func main() {
-	mux := http.NewServeMux()
+	r := repository.NewInMemoryRepository()
+	s := service.NewService(r)
 
-	for path, handler := range handlers.Handlers {
-		mux.HandleFunc(path, writer.Adapt(handler))
-	}
-
-	http.ListenAndServe(":3001", mux)
+	handlers.RegisterRoutes(s)
 }
