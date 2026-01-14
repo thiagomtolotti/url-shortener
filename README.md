@@ -7,8 +7,8 @@
 [x] Repositórios SQL e em memória
 [x] Detectar colisão de id's
 [x] Permitir Deletar URL's
-[ ] Tratamento de erros
-[ ] Docker
-[ ] Documentação
+[x] Tratamento de erros
 [ ] Testes
+[ ] Documentação
+[ ] Docker
 [ ] (Opcional) adicionar data de expiração das URL's

@@ -5,14 +5,17 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
 	"urlshortener.com/src/handlers"
+	"urlshortener.com/src/infra"
 	"urlshortener.com/src/repository"
 	"urlshortener.com/src/service"
 )
 
 func main() {
-	loadEnvironment()
+	err := infra.LoadEnvironment()
+	if err != nil {
+		panic(err)
+	}
 
 	db, err := connectDB()
 	if err != nil {
@@ -23,10 +26,6 @@ func main() {
 	s := service.NewService(r)
 
 	handlers.RegisterRoutes(s)
-}
-
-func loadEnvironment() {
-	godotenv.Load()
 }
 
 func connectDB() (*sql.DB, error) {
