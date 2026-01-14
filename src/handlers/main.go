@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -42,7 +43,17 @@ func (ah *ApiHandler) getURL(w *writer.Writer, r *http.Request) {
 	if r.Method == http.MethodDelete {
 		err := ah.service.DeleteURL(r.PathValue("id"))
 		if err != nil {
-			w.NewJSONResponse(http.StatusInternalServerError, writer.JSON{"message": "There was an error deleting the URL."})
+			switch {
+			case errors.Is(err, service.ErrNotFound):
+				w.NewJSONResponse(http.StatusNotFound, writer.JSON{
+					"message": "URL not found",
+				})
+			default:
+				fmt.Println(err)
+				w.NewJSONResponse(http.StatusInternalServerError, writer.JSON{
+					"message": "Internal Server Error",
+				})
+			}
 			return
 		}
 
@@ -52,7 +63,6 @@ func (ah *ApiHandler) getURL(w *writer.Writer, r *http.Request) {
 
 	url, err := ah.service.GetURL(r.PathValue("id"))
 	if err != nil {
-		fmt.Println(err)
 		w.NewJSONResponse(http.StatusNotFound, writer.JSON{"message": "URL not found"})
 		return
 	}

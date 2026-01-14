@@ -9,6 +9,10 @@ import (
 	"urlshortener.com/src/repository"
 )
 
+var (
+	ErrNotFound = errors.New("url not found")
+)
+
 type Service struct {
 	repo repository.Repository
 }
@@ -50,6 +54,15 @@ func (s *Service) CreateURL(originalURL string) string {
 }
 
 func (s *Service) GetURL(id string) (string, error) {
+	exists, err := s.repo.Exists(id)
+	if err != nil {
+		return "", err
+	}
+
+	if !exists {
+		return "", ErrNotFound
+	}
+
 	return s.repo.GetURL(id)
 }
 
@@ -60,7 +73,7 @@ func (s *Service) DeleteURL(id string) error {
 	}
 
 	if !exists {
-		return errors.New("url not found")
+		return ErrNotFound
 	}
 
 	return s.repo.DeleteURL(id)
