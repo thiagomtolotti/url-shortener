@@ -63,7 +63,18 @@ func (ah *ApiHandler) getURL(w *writer.Writer, r *http.Request) {
 
 	url, err := ah.service.GetURL(r.PathValue("id"))
 	if err != nil {
-		w.NewJSONResponse(http.StatusNotFound, writer.JSON{"message": "URL not found"})
+		switch {
+		case errors.Is(err, service.ErrNotFound):
+			w.NewJSONResponse(http.StatusNotFound, writer.JSON{
+				"message": "URL not found",
+			})
+		default:
+			fmt.Println(err)
+			w.NewJSONResponse(http.StatusInternalServerError, writer.JSON{
+				"message": "Internal Server Error",
+			})
+		}
+
 		return
 	}
 
@@ -87,13 +98,16 @@ func (ah *ApiHandler) createURL(w *writer.Writer, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
-		w.NewJSONResponse(http.StatusBadRequest, writer.JSON{"message": "Invalid request"})
+		w.NewJSONResponse(http.StatusBadRequest, writer.JSON{
+			"message": "Invalid request",
+		})
 		return
 	}
 
 	id := ah.service.CreateURL(req.URL)
 
 	w.NewJSONResponse(http.StatusCreated, writer.JSON{
-		"message": "URL was created successfully", "id": id,
+		"message": "URL was created successfully",
+		"id":      id,
 	})
 }
