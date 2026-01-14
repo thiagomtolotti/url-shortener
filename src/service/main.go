@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 
 	"urlshortener.com/src/repository"
 )
@@ -18,6 +19,25 @@ func NewService(repo repository.Repository) Service {
 }
 
 func (s *Service) CreateURL(originalURL string) string {
+	var id string
+	for {
+		id, err := newRandomId()
+		if err != nil {
+			panic(err)
+		}
+
+		exists, err := s.repo.Exists(id)
+		if err != nil {
+			panic(err)
+		}
+
+		if !exists {
+			break
+		} else {
+			fmt.Println("Collision detected, generating new id")
+		}
+	}
+
 	id, err := newRandomId()
 	if err != nil {
 		panic(err)

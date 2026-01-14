@@ -5,7 +5,7 @@
 [x] Encurtar URL's
 [x] Geração de ids aleatórios
 [x] Repositórios SQL e em memória
-[ ] Detectar colisão de id's
+[x] Detectar colisão de id's
 [ ] Permitir Deletar URL's
 [ ] Docker
 [ ] Documentação
