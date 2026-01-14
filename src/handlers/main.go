@@ -44,7 +44,8 @@ func (ah *ApiHandler) getURL(w *writer.Writer, r *http.Request) {
 		return
 	}
 
-	w.NewJSONResponse(http.StatusOK, writer.JSON{"url": url})
+	http.Redirect(w, r, url, http.StatusFound)
+	return
 }
 
 type CreateURLRequest struct {
