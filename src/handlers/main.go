@@ -38,7 +38,11 @@ func (ah *ApiHandler) getURL(w *writer.Writer, r *http.Request) {
 		return
 	}
 
-	url := ah.service.GetURL(r.PathValue("id"))
+	url, err := ah.service.GetURL(r.PathValue("id"))
+	if err != nil {
+		w.NewJSONResponse(http.StatusNotFound, writer.JSON{"message": "URL not found"})
+		return
+	}
 
 	w.NewJSONResponse(http.StatusOK, writer.JSON{"url": url})
 }

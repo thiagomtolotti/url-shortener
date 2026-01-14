@@ -1,12 +1,13 @@
 package repository
 
 import (
+	"errors"
 	"sync"
 )
 
 type Repository interface {
-	GetURL(id string) string
-	CreateURL(url string, id string)
+	GetURL(id string) (string, error)
+	CreateURL(url string, id string) error
 }
 
 type InMemoryRepository struct {
@@ -20,16 +21,23 @@ func NewInMemoryRepository() Repository {
 	}
 }
 
-func (r *InMemoryRepository) GetURL(id string) string {
+func (r *InMemoryRepository) GetURL(id string) (string, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	return r.store[id]
+	url := r.store[id]
+	if url == "" {
+		return "", errors.New("id not found in store")
+	}
+
+	return r.store[id], nil
 }
 
-func (r *InMemoryRepository) CreateURL(url string, id string) {
+func (r *InMemoryRepository) CreateURL(url string, id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	r.store[id] = url
+
+	return nil
 }

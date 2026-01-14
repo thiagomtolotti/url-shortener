@@ -28,7 +28,7 @@ func (s *Service) CreateURL(originalURL string) string {
 	return id
 }
 
-func (s *Service) GetURL(id string) string {
+func (s *Service) GetURL(id string) (string, error) {
 	return s.repo.GetURL(id)
 }
 
