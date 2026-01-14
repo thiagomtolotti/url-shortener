@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"urlshortener.com/src/service"
@@ -40,6 +41,7 @@ func (ah *ApiHandler) getURL(w *writer.Writer, r *http.Request) {
 
 	url, err := ah.service.GetURL(r.PathValue("id"))
 	if err != nil {
+		fmt.Println(err)
 		w.NewJSONResponse(http.StatusNotFound, writer.JSON{"message": "URL not found"})
 		return
 	}
