@@ -26,7 +26,9 @@ func getURL(w *writer.Writer, r *http.Request) {
 		return
 	}
 
-	w.NewJSONResponse(http.StatusOK, writer.JSON{"url": ""})
+	url := service.GetURL(r.PathValue("id"))
+
+	w.NewJSONResponse(http.StatusOK, writer.JSON{"url": url})
 }
 
 type CreateRequest struct {

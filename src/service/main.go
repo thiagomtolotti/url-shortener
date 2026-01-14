@@ -20,6 +20,10 @@ func CreateURL(originalURL string) ID {
 	return id
 }
 
+func GetURL(id string) string {
+	return db[ID(id)]
+}
+
 func newRandomId() (ID, error) {
 	bytes := make([]byte, 4)
 	if _, err := rand.Read(bytes); err != nil {
