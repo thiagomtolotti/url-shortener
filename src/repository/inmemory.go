@@ -36,3 +36,12 @@ func (r *InMemoryRepository) CreateURL(url string, id string) error {
 
 	return nil
 }
+
+func (r *InMemoryRepository) Exists(id string) (bool, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	exists := r.store[id] != ""
+
+	return exists, nil
+}

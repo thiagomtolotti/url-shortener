@@ -42,3 +42,20 @@ func (r *SQLRepository) CreateURL(url string, id string) error {
 
 	return nil
 }
+
+func (r *SQLRepository) Exists(id string) (bool, error) {
+	row, err := r.conn.Query(`SELECT COUNT(*) > 0 FROM shortened WHERE id = $1`, id)
+	if err != nil {
+		return false, fmt.Errorf("error checking if id exists: %w", err)
+	}
+	defer row.Close()
+
+	row.Next()
+	var exists bool
+
+	if err := row.Scan(&exists); err != nil {
+		return false, fmt.Errorf("error checking if id exists: %w", err)
+	}
+
+	return exists, nil
+}
