@@ -1,19 +1,20 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hi there")
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", ping)
+
+	http.ListenAndServe(":3001", mux)
+}
+
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Service is online",
 	})
-
-	s := &http.Server{
-		Addr: ":8080",
-	}
-
-	s.ListenAndServe()
-	fmt.Println("Server is running on http://localhost:8080")
 }
