@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 
 	"urlshortener.com/src/repository"
@@ -50,6 +51,19 @@ func (s *Service) CreateURL(originalURL string) string {
 
 func (s *Service) GetURL(id string) (string, error) {
 	return s.repo.GetURL(id)
+}
+
+func (s *Service) DeleteURL(id string) error {
+	exists, err := s.repo.Exists(id)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return errors.New("url not found")
+	}
+
+	return s.repo.DeleteURL(id)
 }
 
 func newRandomId() (string, error) {

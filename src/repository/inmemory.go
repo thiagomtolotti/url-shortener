@@ -37,6 +37,15 @@ func (r *InMemoryRepository) CreateURL(url string, id string) error {
 	return nil
 }
 
+func (r *InMemoryRepository) DeleteURL(id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	delete(r.store, id)
+
+	return nil
+}
+
 func (r *InMemoryRepository) Exists(id string) (bool, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()

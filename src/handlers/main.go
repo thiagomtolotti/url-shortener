@@ -34,8 +34,19 @@ func (ah *ApiHandler) ping(w *writer.Writer, r *http.Request) {
 }
 
 func (ah *ApiHandler) getURL(w *writer.Writer, r *http.Request) {
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodGet && r.Method != http.MethodDelete {
 		w.NewJSONResponse(http.StatusMethodNotAllowed, writer.JSON{"message": "Method not allowed"})
+		return
+	}
+
+	if r.Method == http.MethodDelete {
+		err := ah.service.DeleteURL(r.PathValue("id"))
+		if err != nil {
+			w.NewJSONResponse(http.StatusInternalServerError, writer.JSON{"message": "There was an error deleting the URL."})
+			return
+		}
+
+		w.NewJSONResponse(http.StatusOK, writer.JSON{"message": "URL deleted successfully"})
 		return
 	}
 

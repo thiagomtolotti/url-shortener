@@ -6,7 +6,7 @@
 [x] Geração de ids aleatórios
 [x] Repositórios SQL e em memória
 [x] Detectar colisão de id's
-[ ] Permitir Deletar URL's
+[x] Permitir Deletar URL's
 [ ] Docker
 [ ] Documentação
 [ ] Testes
