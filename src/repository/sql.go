@@ -3,6 +3,8 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
 type SQLRepository struct {
@@ -16,13 +18,13 @@ func NewSQLRepository(c *sql.DB) Repository {
 }
 
 func (r *SQLRepository) GetURL(id string) (string, error) {
-	row, err := r.conn.Query(`SELECT url FOM shortened WHERE id = $1`, id)
+	row, err := r.conn.Query(`SELECT url FROM shortened WHERE id = $1`, id)
 	if err != nil {
 		return "", fmt.Errorf("error fetching url: %w", err)
 	}
 	defer row.Close()
 
-	row.Close()
+	row.Next()
 	var url string
 
 	if err := row.Scan(&url); err != nil {
@@ -33,7 +35,7 @@ func (r *SQLRepository) GetURL(id string) (string, error) {
 }
 
 func (r *SQLRepository) CreateURL(url string, id string) error {
-	_, err := r.conn.Query(`INSERT INTO shortened (id, url) VALUES ($1, $2)`)
+	_, err := r.conn.Query(`INSERT INTO shortened (id, url) VALUES ($1, $2)`, id, url)
 	if err != nil {
 		return fmt.Errorf("error inserting url: %w", err)
 	}
