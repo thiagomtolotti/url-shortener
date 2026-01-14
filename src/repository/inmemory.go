@@ -5,11 +5,6 @@ import (
 	"sync"
 )
 
-type Repository interface {
-	GetURL(id string) (string, error)
-	CreateURL(url string, id string) error
-}
-
 type InMemoryRepository struct {
 	mu    sync.RWMutex
 	store map[string]string
