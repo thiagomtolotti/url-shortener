@@ -33,7 +33,7 @@ Handlers depend only on the service interface, and the service depends only on r
 - [x] Allow deletion of URLs
 - [x] Error handling
 - [x] Documentation
+- [ ] Database migration scripts
 - [ ] Docker
 - [ ] Tests
-- [ ] Database migration scripts
 - [ ] (Optional) Add expiration date for URLs
