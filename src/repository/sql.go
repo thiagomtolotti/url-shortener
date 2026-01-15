@@ -18,16 +18,10 @@ func NewSQLRepository(c *sql.DB) Repository {
 }
 
 func (r *SQLRepository) GetURL(id string) (string, error) {
-	row, err := r.conn.Query(`SELECT url FROM shortened WHERE id = $1`, id)
-	if err != nil {
-		return "", fmt.Errorf("error fetching url: %w", err)
-	}
-	defer row.Close()
-
-	row.Next()
 	var url string
 
-	if err := row.Scan(&url); err != nil {
+	err := r.conn.QueryRow(`SELECT url FROM shortened WHERE id = $1`, id).Scan(&url)
+	if err != nil {
 		return "", fmt.Errorf("error fetching url: %w", err)
 	}
 
@@ -53,16 +47,10 @@ func (r *SQLRepository) DeleteURL(id string) error {
 }
 
 func (r *SQLRepository) Exists(id string) (bool, error) {
-	row, err := r.conn.Query(`SELECT COUNT(*) > 0 FROM shortened WHERE id = $1`, id)
-	if err != nil {
-		return false, fmt.Errorf("error checking if id exists: %w", err)
-	}
-	defer row.Close()
-
-	row.Next()
 	var exists bool
 
-	if err := row.Scan(&exists); err != nil {
+	err := r.conn.QueryRow(`SELECT COUNT(*) > 0 FROM shortened WHERE id = $1`, id).Scan(&exists)
+	if err != nil {
 		return false, fmt.Errorf("error checking if id exists: %w", err)
 	}
 
