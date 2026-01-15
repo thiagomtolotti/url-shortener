@@ -3,6 +3,8 @@ package infra
 import (
 	"database/sql"
 	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
 func ConnectToDB() (*sql.DB, error) {
